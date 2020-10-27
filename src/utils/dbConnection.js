@@ -5,7 +5,9 @@ const conectionString = `mongodb+srv://${process.env.DB_HOST}/${process.env.DB_N
 console.log("=============",conectionString)
 const connection = mongoose.connect(conectionString, {
   user: process.env.DB_USER,
-  pass: process.env.DB_PASS
+  pass: process.env.DB_PASS,
+  // useNewUrlParser: true, //as advised on the Error 
+  //  useUnifiedTopology: true //as advised on the Error 
 });
 
-module.exports = { connection };
+module.exports = { connection }; 

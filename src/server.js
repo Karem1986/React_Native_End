@@ -1,9 +1,6 @@
 
 const {config} = require('dotenv');
 const {resolve} = require('path');
-//Favourites route imported here:
-const favorites = require('./routers/favorites')
-
 
 const BASE_PATH = __dirname;
 config({ path: resolve(`${BASE_PATH}/../.env`) });
@@ -16,6 +13,8 @@ const {connection}= require('./utils/dbConnection')
 const app = express();
 //Import the routes:
 const authRouter = require("./routers/auth")
+const favorites = require('./routers/favorites')
+const users = require('./routers/user')
 
 // PORT
 const port = process.env.PORT || 4002;
@@ -29,6 +28,7 @@ app.use(cors({ origin: '*' }));
 //Register routes here
 app.use("/", authRouter);
 app.use("/technews/favorites", favorites)
+app.use("/userprofile", users)
 
 //Listen on the specified port: 
 connection.then(() => {

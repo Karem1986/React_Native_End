@@ -29,6 +29,12 @@ const loginValidation = [
      .withMessage('Password must be at least 6 characters')
 ]
 
+const generateToken = user => {
+  return jwt.sign(
+    {_id: user._id, email: user.email, name: user.name}, secretKey
+     )
+}
+
 //Create a new user
 router.post('/signup', validate, async (req, res) => {
 
@@ -40,7 +46,8 @@ router.post('/signup', validate, async (req, res) => {
 
   //Check that user does not signup with an email that already exists
   const userExist = await userModel.findOne({email: req.body.email})
-  if(userExist) return res.status(400).send('Email already exists')
+  if(userExist) return res.status(400).send({succes: false, message: 
+    'Email already exists' })
 
   const salt = await bcrypt.genSalt()
   const hashedPassword = await bcrypt.hash(req.body.password, salt)
@@ -53,13 +60,21 @@ router.post('/signup', validate, async (req, res) => {
 
 try {
   const savedUser = await user.save()
-  res.send({id: savedUser._id, name: savedUser.name, email: savedUser.email})
+  //create and assign a token when the user register
+  const token = generateToken(user)
+  res.send({success: true, data:{
+    id: savedUser._id,
+    name: savedUser.name,
+    email: savedUser.email
+  },
+  token 
+ })
 } catch (error) {
-  return res.status(500).send({ message: 'Server error, something is wrong' });
+  return res.status(500).send({ success: false, error});
 }
 });
 
-//Login 
+//LOGIN 
 router.post('/login', loginValidation, async (req, res) => {
 //Check if the email exists
   const errors = validationResult(req)
@@ -69,15 +84,16 @@ router.post('/login', loginValidation, async (req, res) => {
   }
 
   const user = await userModel.findOne({email: req.body.email})
-  if(!user) return res.status(404).send('User is not registered')
+  if(!user) return res.status(404).send({success: false, message: "User is not registered"})
+
 //Check if password is correct
 
   const validPassword = await bcrypt.compare(req.body.password, user.password)
-  if(!validPassword) return res.status(404).send('Invalid email or password')
+  if(!validPassword) return res.status(404).send({success: false, message: "Invalid password" })
 
   //JWT creat and assign a token 
   const token = jwt.sign({_id: user._id, email: user.email}, secretKey )
-  res.header('auth-token', token).send({message: 'Logged in successfuly', token})
+  res.header('auth-token', token).send({sucess:true, message: 'Logged in successfuly', token})
 })
 
 //EXPORT THE ROUTER
