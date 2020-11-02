@@ -6,8 +6,8 @@ console.log("=============",conectionString)
 const connection = mongoose.connect(conectionString, {
   user: process.env.DB_USER,
   pass: process.env.DB_PASS,
-  // useNewUrlParser: true, //as advised on the Error 
-  //  useUnifiedTopology: true //as advised on the Error 
+  useNewUrlParser: true, //as advised on the Error 
+   useUnifiedTopology: true //as advised on the Error 
 });
 
 module.exports = { connection }; 
